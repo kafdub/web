@@ -1,0 +1,2347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PAR AVION — Souvenir Marketplace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #FDFBF7;
+    --ink: #21242C;
+    --postal-red: #D2382C;
+    --airmail-blue: #1D4E89;
+    --stamp-sand: #EFE7D8;
+    --muted: #6E7480;
+    --line: #E3DFD6;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Public Sans', system-ui, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.5;
+  }
+
+  /* ---- Airmail hatched border: the signature element ---- */
+  .airmail {
+    height: 12px;
+    background: repeating-linear-gradient(
+      -45deg,
+      var(--postal-red) 0 14px,
+      var(--paper) 14px 26px,
+      var(--airmail-blue) 26px 40px,
+      var(--paper) 40px 52px
+    );
+  }
+
+  /* ---------------- Page switching ---------------- */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ---------------- Header ---------------- */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--ink);
+    cursor: pointer;
+    background: none;
+    border: none;
+    font: inherit;
+  }
+
+  .brand h1 {
+    font-family: 'Anton', sans-serif;
+    font-size: 1.6rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .brand h1 .accent { color: var(--postal-red); }
+
+  .brand .tagline {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .cart-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    padding: 10px 18px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: background 0.15s;
+  }
+  .cart-btn:hover { background: var(--airmail-blue); }
+  .cart-btn:focus-visible { outline: 3px solid var(--postal-red); outline-offset: 2px; }
+
+  .cart-count {
+    background: var(--postal-red);
+    color: #fff;
+    border-radius: 999px;
+    min-width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    padding: 0 6px;
+  }
+
+  /* Header "Contact" link */
+  .nav-link {
+    background: transparent;
+    border: 1.5px solid var(--ink);
+    color: var(--ink);
+    padding: 10px 16px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .nav-link:hover { background: var(--stamp-sand); }
+  .nav-link:focus-visible { outline: 3px solid var(--airmail-blue); outline-offset: 2px; }
+
+  /* ---------------- Contact page ---------------- */
+  .contact-rows { display: flex; flex-direction: column; gap: 14px; }
+
+  .contact-row {
+    display: grid;
+    grid-template-columns: 46px 1fr;
+    gap: 12px;
+    align-items: center;
+    padding: 12px;
+    border: 1px dashed var(--line);
+    background: var(--paper);
+  }
+
+  .contact-row .ico {
+    width: 46px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    background: var(--stamp-sand);
+    border-radius: 999px;
+  }
+
+  .contact-row .lbl {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .contact-row .val {
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+  .contact-row .val a { color: var(--airmail-blue); text-decoration: none; }
+  .contact-row .val a:hover { text-decoration: underline; }
+
+  .contact-row .sub { font-size: 0.76rem; color: var(--muted); }
+
+  .field textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid var(--line);
+    background: var(--paper);
+    font-family: 'Public Sans', sans-serif;
+    font-size: 0.9rem;
+    color: var(--ink);
+    resize: vertical;
+    min-height: 110px;
+    transition: border-color 0.12s;
+  }
+  .field textarea:focus { outline: none; border-color: var(--airmail-blue); }
+  .field textarea.invalid { border-color: var(--postal-red); }
+  .field textarea.invalid ~ .err { display: block; }
+
+  .contact-sent {
+    text-align: center;
+    padding: 40px 16px;
+  }
+  .contact-sent .big { font-size: 3rem; display: block; margin-bottom: 10px; }
+  .contact-sent h4 {
+    font-family: 'Anton', sans-serif;
+    font-size: 1.3rem;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .contact-sent p { font-size: 0.88rem; color: var(--muted); }
+
+  /* ---------------- Home: sections, categories, mosaic ---------------- */
+  .home-sec {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 10px 24px 26px;
+  }
+
+  .sec-title {
+    font-family: 'Anton', sans-serif;
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-bottom: 16px;
+  }
+
+  /* Category cards: one per city, click through to the Gallery */
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 14px;
+  }
+
+  .cat-card {
+    border: 1.5px solid var(--ink);
+    background: #fff;
+    padding: 16px 14px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    transition: all 0.15s;
+    font-family: inherit;
+    text-align: left;
+  }
+  .cat-card:hover {
+    background: var(--stamp-sand);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 18px rgba(33, 36, 44, 0.12);
+  }
+  .cat-card:focus-visible { outline: 3px solid var(--airmail-blue); outline-offset: 2px; }
+
+  .cat-card .cat-emoji { font-size: 1.9rem; }
+
+  .cat-card .cat-name {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+
+  .cat-card .cat-count {
+    font-size: 0.74rem;
+    color: var(--muted);
+  }
+
+  /* Granular mosaic: dense, image-only tiles (no price, no cart) */
+  .mosaic {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 10px;
+  }
+
+  .mtile {
+    aspect-ratio: 1;
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.6rem;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+    transition: transform 0.15s, box-shadow 0.15s;
+    padding: 0;
+  }
+  .mtile:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 18px rgba(33, 36, 44, 0.18);
+    z-index: 2;
+  }
+  .mtile:focus-visible { outline: 3px solid var(--airmail-blue); outline-offset: 2px; }
+
+  .mtile .mname {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink);
+    background: rgba(255, 255, 255, 0.85);
+    padding: 4px 6px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Gallery image overlay: price + add-to-cart ON the image */
+  .gcard .scene { cursor: pointer; }
+
+  .gbar {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(2px);
+  }
+
+  .gbar .gprice {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  /* ---------------- Gallery page ---------------- */
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 30px;
+    padding-top: 6px;
+  }
+
+  /* Each tile is styled like a postcard pinned to a board */
+  .gcard {
+    background: #fff;
+    border: 1px solid var(--line);
+    padding: 10px 10px 14px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 3px 8px rgba(33, 36, 44, 0.08);
+  }
+  .gcard:nth-child(3n+1) { transform: rotate(-1.2deg); }
+  .gcard:nth-child(3n+2) { transform: rotate(0.8deg); }
+  .gcard:nth-child(3n)   { transform: rotate(-0.4deg); }
+  .gcard:hover {
+    transform: rotate(0deg) translateY(-6px) scale(1.02);
+    box-shadow: 0 18px 30px rgba(33, 36, 44, 0.25);
+    z-index: 2;
+    position: relative;
+  }
+  .gcard:focus-visible { outline: 3px solid var(--airmail-blue); outline-offset: 3px; }
+
+  .gcard .scene {
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 3.4rem;
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .gcard .scene .sky-label {
+    position: absolute;
+    top: 8px;
+    left: 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(33, 36, 44, 0.6);
+    background: rgba(255, 255, 255, 0.6);
+    padding: 3px 8px;
+    border-radius: 999px;
+  }
+
+  .gcard .meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-top: 10px;
+    gap: 8px;
+  }
+
+  .gcard .meta .gcity {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--postal-red);
+    font-weight: 600;
+  }
+
+  .gcard .meta .gcap {
+    font-size: 0.78rem;
+    color: var(--muted);
+    text-align: right;
+  }
+
+  /* Lightbox: enlarged postcard view */
+  .glightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(33, 36, 44, 0.7);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 150;
+    padding: 24px;
+  }
+  .glightbox.open { display: flex; }
+
+  .glightbox .gbig {
+    background: #fff;
+    border: 1px solid var(--line);
+    padding: 14px 14px 18px;
+    max-width: 560px;
+    width: 100%;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+  }
+
+  .glightbox .gbig .scene {
+    height: 320px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    font-size: 6rem;
+    user-select: none;
+  }
+
+  .glightbox .gbig .meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-top: 12px;
+    gap: 10px;
+  }
+
+  .glightbox .gbig .gcity {
+    font-family: 'Anton', sans-serif;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    color: var(--postal-red);
+  }
+
+  .glightbox .gbig .gcap { font-size: 0.9rem; color: var(--muted); text-align: right; }
+
+  .glightbox .gclose {
+    position: absolute;
+    top: 18px;
+    right: 22px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 2.2rem;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  /* ---------------- Hero ---------------- */
+  .hero {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 56px 24px 40px;
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 40px;
+    align-items: center;
+  }
+
+  .hero h2 {
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(2.4rem, 6vw, 4.4rem);
+    line-height: 1.02;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+  }
+
+  .hero h2 .blue { color: var(--airmail-blue); }
+  .hero h2 .red { color: var(--postal-red); }
+
+  .hero p {
+    margin-top: 16px;
+    max-width: 46ch;
+    color: var(--muted);
+    font-size: 1.02rem;
+  }
+
+  /* ---- Bangladesh landmarks stamp (right of the headline) ---- */
+  /* Wrapper carries the shadow + hover lift. The shadow is applied
+     here (not on the masked element) because drop-shadow() follows
+     the child's actual cut-out silhouette — so the shadow itself
+     is scalloped, exactly like a real stamp's shadow. */
+  .stamp-wrap {
+    justify-self: center;
+    transform: rotate(3deg);
+    filter: drop-shadow(0 6px 10px rgba(33, 36, 44, 0.25));
+    transition: transform 0.25s ease, filter 0.25s ease;
+  }
+
+  .stamp-wrap:hover {
+    transform: rotate(0deg) translateY(-10px) scale(1.03);
+    filter: drop-shadow(0 26px 30px rgba(33, 36, 44, 0.45));
+  }
+
+  /* The stamp itself: REAL perforation — semicircular bites cut out
+     of the edge with a mask, so the outline is genuinely scalloped
+     (transparent, not painted over) like a stamp torn from a sheet */
+  .hero-stamp {
+    width: 235px;                 /* portrait orientation */
+    padding: 14px;
+    background-color: #DDEDE4;    /* soft Bangladesh-green frame */
+    --notch: 6px;                 /* radius of each perforation bite */
+    -webkit-mask:
+      radial-gradient(circle var(--notch) at 50% 0,    transparent 98%, #000) top    / 22px 12px repeat-x,
+      radial-gradient(circle var(--notch) at 50% 100%, transparent 98%, #000) bottom / 22px 12px repeat-x,
+      radial-gradient(circle var(--notch) at 0 50%,    transparent 98%, #000) left   / 12px 22px repeat-y,
+      radial-gradient(circle var(--notch) at 100% 50%, transparent 98%, #000) right  / 12px 22px repeat-y,
+      linear-gradient(#000, #000) center / calc(100% - 24px) calc(100% - 24px) no-repeat;
+    mask:
+      radial-gradient(circle var(--notch) at 50% 0,    transparent 98%, #000) top    / 22px 12px repeat-x,
+      radial-gradient(circle var(--notch) at 50% 100%, transparent 98%, #000) bottom / 22px 12px repeat-x,
+      radial-gradient(circle var(--notch) at 0 50%,    transparent 98%, #000) left   / 12px 22px repeat-y,
+      radial-gradient(circle var(--notch) at 100% 50%, transparent 98%, #000) right  / 12px 22px repeat-y,
+      linear-gradient(#000, #000) center / calc(100% - 24px) calc(100% - 24px) no-repeat;
+  }
+
+  .stamp-inner {
+    background: linear-gradient(180deg, #E7F3EC 0%, #F3FAF6 70%);
+    border: 1px solid rgba(0, 106, 78, 0.3);
+    padding: 10px 10px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .stamp-inner svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .stamp-caption {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .stamp-caption .country {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #006A4E;            /* Bangladesh flag green */
+  }
+
+  .stamp-caption .value {
+    font-family: 'Anton', sans-serif;
+    font-size: 1.15rem;
+    color: #F42A41;            /* Bangladesh flag red */
+  }
+
+  /* ---------------- Filters ---------------- */
+  .filters {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .filters .label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-right: 6px;
+  }
+
+  .chip {
+    border: 1.5px solid var(--ink);
+    background: transparent;
+    color: var(--ink);
+    padding: 6px 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.76rem;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    border-radius: 999px;
+    transition: all 0.12s;
+  }
+  .chip:hover { background: var(--stamp-sand); }
+  .chip:focus-visible { outline: 3px solid var(--airmail-blue); outline-offset: 2px; }
+  .chip.active {
+    background: var(--airmail-blue);
+    border-color: var(--airmail-blue);
+    color: #fff;
+  }
+
+  /* ---------------- Product grid ---------------- */
+  .grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 28px;
+  }
+
+  .card {
+    background: #fff;
+    border: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(33, 36, 44, 0.10);
+  }
+
+  .card-img {
+    height: 190px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4.2rem;
+    position: relative;
+    user-select: none;
+  }
+
+  .card-img .postmark {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(33, 36, 44, 0.55);
+    border: 1.5px solid rgba(33, 36, 44, 0.35);
+    border-radius: 999px;
+    padding: 5px 9px;
+    transform: rotate(8deg);
+    background: rgba(255, 255, 255, 0.55);
+  }
+
+  .card-body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+  }
+
+  .card-body .city {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--postal-red);
+  }
+
+  .card-body h3 {
+    font-size: 1.02rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .card-body .desc {
+    font-size: 0.85rem;
+    color: var(--muted);
+    flex: 1;
+  }
+
+  .card-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+    gap: 10px;
+  }
+
+  .price {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  .add-btn {
+    border: 1.5px solid var(--ink);
+    background: transparent;
+    color: var(--ink);
+    padding: 8px 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.74rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+  .add-btn:hover { background: var(--postal-red); border-color: var(--postal-red); color: #fff; }
+  .add-btn:focus-visible { outline: 3px solid var(--airmail-blue); outline-offset: 2px; }
+  .add-btn.added { background: var(--airmail-blue); border-color: var(--airmail-blue); color: #fff; }
+
+  /* ---------------- Cart drawer ---------------- */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(33, 36, 44, 0.45);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    z-index: 90;
+  }
+  .overlay.open { opacity: 1; pointer-events: auto; }
+
+  .drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: min(420px, 100vw);
+    background: var(--paper);
+    z-index: 100;
+    transform: translateX(105%);
+    transition: transform 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -12px 0 32px rgba(33, 36, 44, 0.18);
+  }
+  .drawer.open { transform: translateX(0); }
+
+  .drawer-head {
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .drawer-head h2 {
+    font-family: 'Anton', sans-serif;
+    font-size: 1.3rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--ink);
+    line-height: 1;
+    padding: 4px 8px;
+  }
+  .close-btn:focus-visible { outline: 3px solid var(--postal-red); outline-offset: 2px; }
+
+  .drawer-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .cart-empty {
+    text-align: center;
+    color: var(--muted);
+    padding: 48px 12px;
+    font-size: 0.92rem;
+  }
+  .cart-empty .big { font-size: 3rem; display: block; margin-bottom: 10px; }
+
+  .cart-item {
+    display: grid;
+    grid-template-columns: 58px 1fr auto;
+    gap: 12px;
+    align-items: center;
+    background: #fff;
+    border: 1px solid var(--line);
+    padding: 10px;
+  }
+
+  .cart-item .thumb {
+    width: 58px;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+  }
+
+  .cart-item .info h4 { font-size: 0.88rem; font-weight: 600; }
+  .cart-item .info .unit {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.76rem;
+    color: var(--muted);
+  }
+
+  .qty-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+  }
+
+  .qty-btn {
+    width: 24px;
+    height: 24px;
+    border: 1.5px solid var(--ink);
+    background: transparent;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+  }
+  .qty-btn:hover { background: var(--stamp-sand); }
+  .qty-btn:focus-visible { outline: 2px solid var(--airmail-blue); }
+
+  .qty-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    min-width: 22px;
+    text-align: center;
+  }
+
+  .line-total {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-align: right;
+  }
+
+  .remove-btn {
+    background: none;
+    border: none;
+    color: var(--postal-red);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    padding: 2px 0;
+    margin-top: 4px;
+  }
+  .remove-btn:hover { text-decoration: underline; }
+
+  .drawer-foot {
+    border-top: 1px solid var(--line);
+    padding: 18px 20px;
+  }
+
+  .subtotal-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 12px;
+  }
+
+  .subtotal-row .lbl {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .subtotal-row .amt {
+    font-family: 'Anton', sans-serif;
+    font-size: 1.5rem;
+  }
+
+  .checkout-btn {
+    width: 100%;
+    background: var(--postal-red);
+    color: #fff;
+    border: none;
+    padding: 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.88rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .checkout-btn:hover { background: var(--airmail-blue); }
+  .checkout-btn:disabled { background: var(--line); color: var(--muted); cursor: not-allowed; }
+  .checkout-btn:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+
+  .ship-note {
+    margin-top: 10px;
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  /* ---------------- Checkout page ---------------- */
+  .checkout-wrap {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 24px 64px;
+  }
+
+  .breadcrumbs {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.74rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 22px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .breadcrumbs .crumb-active { color: var(--postal-red); font-weight: 600; }
+  .breadcrumbs .sep { color: var(--line); }
+
+  .page-title {
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    margin-bottom: 26px;
+  }
+
+  .checkout-cols {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 32px;
+    align-items: start;
+  }
+
+  .panel {
+    background: #fff;
+    border: 1px solid var(--line);
+    padding: 24px;
+  }
+
+  .panel h3 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--airmail-blue);
+    margin-bottom: 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .field { margin-bottom: 14px; }
+
+  .field label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+  .field label .req { color: var(--postal-red); }
+  .field label .opt {
+    color: var(--muted);
+    font-weight: 400;
+    font-size: 0.72rem;
+  }
+
+  .field input,
+  .field select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid var(--line);
+    background: var(--paper);
+    font-family: 'Public Sans', sans-serif;
+    font-size: 0.9rem;
+    color: var(--ink);
+    transition: border-color 0.12s;
+  }
+  .field input:focus,
+  .field select:focus {
+    outline: none;
+    border-color: var(--airmail-blue);
+  }
+  .field input.invalid,
+  .field select.invalid { border-color: var(--postal-red); }
+
+  .field .err {
+    display: none;
+    font-size: 0.74rem;
+    color: var(--postal-red);
+    margin-top: 4px;
+  }
+  .field input.invalid ~ .err,
+  .field select.invalid ~ .err { display: block; }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  /* Order summary */
+  .sum-item {
+    display: grid;
+    grid-template-columns: 44px 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--line);
+  }
+  .sum-item .thumb {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+  }
+  .sum-item .nm { font-size: 0.84rem; font-weight: 600; }
+  .sum-item .q {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.74rem;
+    color: var(--muted);
+  }
+  .sum-item .amt {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.84rem;
+    font-weight: 600;
+  }
+
+  .totals { margin-top: 14px; }
+  .totals .trow {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.86rem;
+    padding: 4px 0;
+  }
+  .totals .trow .k { color: var(--muted); }
+  .totals .trow .v { font-family: 'IBM Plex Mono', monospace; }
+  .totals .trow.free .v { color: var(--airmail-blue); font-weight: 600; }
+  .totals .grand {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-top: 10px;
+    padding-top: 12px;
+    border-top: 1.5px solid var(--ink);
+  }
+  .totals .grand .k {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .totals .grand .v {
+    font-family: 'Anton', sans-serif;
+    font-size: 1.5rem;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  .btn-secondary {
+    flex: 1;
+    background: transparent;
+    color: var(--ink);
+    border: 1.5px solid var(--ink);
+    padding: 13px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+  .btn-secondary:hover { background: var(--stamp-sand); }
+  .btn-secondary:focus-visible { outline: 3px solid var(--airmail-blue); outline-offset: 2px; }
+
+  .btn-primary {
+    flex: 2;
+    background: var(--postal-red);
+    color: #fff;
+    border: none;
+    padding: 13px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-primary:hover { background: var(--airmail-blue); }
+  .btn-primary:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+
+  /* ---------------- Confirmation page ---------------- */
+  .confirm-wrap {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 56px 24px 72px;
+    text-align: center;
+  }
+
+  .confirm-stamp {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 26px 34px;
+    transform: rotate(-2deg);
+    margin-bottom: 24px;
+    /* perforation on the edges only */
+    background-color: var(--stamp-sand);
+    background-image:
+      radial-gradient(circle 5px at 50% 0,    var(--paper) 4.6px, transparent 5px),
+      radial-gradient(circle 5px at 50% 100%, var(--paper) 4.6px, transparent 5px),
+      radial-gradient(circle 5px at 0 50%,    var(--paper) 4.6px, transparent 5px),
+      radial-gradient(circle 5px at 100% 50%, var(--paper) 4.6px, transparent 5px);
+    background-size: 20px 10px, 20px 10px, 10px 20px, 10px 20px;
+    background-position: top, bottom, left, right;
+    background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+  }
+  .confirm-stamp .tick { font-size: 3rem; }
+  .confirm-stamp .lbl {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--airmail-blue);
+  }
+
+  .confirm-wrap h2 {
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(1.9rem, 5vw, 2.8rem);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .order-no {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.86rem;
+    color: var(--postal-red);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    margin-bottom: 24px;
+  }
+
+  .confirm-panel {
+    background: #fff;
+    border: 1px solid var(--line);
+    text-align: left;
+    padding: 22px 24px;
+    margin-bottom: 16px;
+  }
+
+  .confirm-panel h3 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.76rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--airmail-blue);
+    margin-bottom: 12px;
+  }
+
+  .addr-lines { font-size: 0.92rem; line-height: 1.7; }
+
+  .confirm-note {
+    font-size: 0.86rem;
+    color: var(--muted);
+    margin: 18px 0 26px;
+  }
+
+  /* ---------------- Toast ---------------- */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--ink);
+    color: var(--paper);
+    padding: 12px 22px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    z-index: 200;
+    transition: transform 0.25s ease;
+    pointer-events: none;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ---------------- Footer ---------------- */
+  footer {
+    margin-top: 48px;
+    border-top: 1px solid var(--line);
+  }
+
+  .footer-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 28px 24px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.74rem;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* ---------------- Responsive ---------------- */
+  @media (max-width: 860px) {
+    .checkout-cols { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 760px) {
+    .hero { grid-template-columns: 1fr; padding: 36px 20px 24px; }
+    .stamp-wrap { display: none; }
+    .grid { padding: 16px; gap: 16px; }
+    .field-row { grid-template-columns: 1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="airmail" aria-hidden="true"></div>
+
+<header>
+  <div class="header-inner">
+    <button class="brand" id="brandHome" title="Back to shop">
+      <h1>Par <span class="accent">Avion</span></h1>
+      <span class="tagline">Souvenir Marketplace</span>
+    </button>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <button class="nav-link" id="navHome">Home</button>
+      <button class="nav-link" id="navGallery">Gallery</button>
+      <button class="nav-link" id="navContact">Contact</button>
+      <button class="cart-btn" id="cartToggle" aria-label="Open cart">
+        Cart <span class="cart-count" id="cartCount">0</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ================= PAGE 1: SHOP ================= -->
+<div class="page active" id="page-shop">
+  <section class="hero">
+    <div>
+      <h2>Bring the <span class="blue">world</span> home,<br>one <span class="red">keepsake</span> at a time.</h2>
+      <p>Small treasures collected from makers and markets in twelve cities. Every order ships flat-packed, postcard included, no airport gift-shop markup.</p>
+    </div>
+
+    <!-- Bangladesh landmarks postage stamp, perforated edges -->
+    <div class="stamp-wrap">
+      <div class="hero-stamp">
+      <div class="stamp-inner">
+        <svg viewBox="0 0 600 780" xmlns="http://www.w3.org/2000/svg" role="img"
+             aria-label="Portrait postage stamp showing a red globe above Bangladesh landmarks: the National Parliament and the Sixty Dome Mosque">
+
+          <!-- Globe centrepiece: red wireframe world, now the focal point
+               of the stamp (echoing the flag's red disc) -->
+          <g stroke="#F42A41" fill="none" stroke-width="8" opacity="0.85">
+            <circle cx="300" cy="360" r="150" fill="#F42A41" fill-opacity="0.08"/>
+            <!-- meridians -->
+            <line x1="300" y1="210" x2="300" y2="510"/>
+            <ellipse cx="300" cy="360" rx="70" ry="150"/>
+            <ellipse cx="300" cy="360" rx="122" ry="150"/>
+            <!-- equator + parallels -->
+            <line x1="150" y1="360" x2="450" y2="360"/>
+            <path d="M170 288 Q300 254 430 288"/>
+            <path d="M170 432 Q300 466 430 432"/>
+          </g>
+
+          <g fill="#006A4E">
+            <!-- Jatiyo Sangsad Bhaban (National Parliament), Dhaka: mid-ground, right -->
+            <path d="M452 690 L452 610 L472 610 L472 594 L532 594 L532 610 L552 610 L552 690 Z"/>
+            <circle cx="502" cy="630" r="12" fill="#F3FAF6"/>
+            <polygon points="488,690 502,658 516,690" fill="#F3FAF6"/>
+            <rect x="424" y="634" width="24" height="56"/>
+            <rect x="556" y="634" width="24" height="56"/>
+
+            <!-- 4. Shat Gombuj (Sixty Dome) Mosque, Bagerhat: dome row along the base -->
+            <rect x="40" y="642" width="340" height="48"/>
+            <path d="M70 642 Q92 610 114 642 Z"/>
+            <path d="M122 642 Q144 610 166 642 Z"/>
+            <path d="M174 642 Q196 610 218 642 Z"/>
+            <path d="M226 642 Q248 610 270 642 Z"/>
+            <path d="M278 642 Q300 610 322 642 Z"/>
+            <!-- corner turrets -->
+            <rect x="34" y="622" width="12" height="68"/>
+            <circle cx="40" cy="620" r="7"/>
+            <rect x="374" y="622" width="12" height="68"/>
+            <circle cx="380" cy="620" r="7"/>
+          </g>
+
+          <!-- ground line tying the landmarks together -->
+          <rect x="0" y="688" width="600" height="5" fill="#006A4E" opacity="0.6"/>
+
+          <!-- water band below (rivers of Bangladesh) -->
+          <path d="M0 720 Q75 708 150 720 T300 720 T450 720 T600 720 L600 738 Q525 750 450 738 T300 738 T150 738 T0 738 Z"
+                fill="#006A4E" opacity="0.25"/>
+          <path d="M0 752 Q100 742 200 752 T400 752 T600 752 L600 764 Q500 774 400 764 T200 764 T0 764 Z"
+                fill="#006A4E" opacity="0.15"/>
+        </svg>
+
+        <div class="stamp-caption">
+          <span class="country">Bangladesh &middot; Par Avion</span>
+          <span class="value">&#2547;10</span>
+        </div>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- Categories: shop by city (click-through to the Gallery) -->
+  <div class="home-sec">
+    <h3 class="sec-title">Shop by city</h3>
+    <div class="cat-grid" id="catGrid"></div>
+  </div>
+</div>
+
+<!-- ================= PAGE 2: CHECKOUT / DELIVERY ADDRESS ================= -->
+<div class="page" id="page-checkout">
+  <div class="checkout-wrap">
+    <nav class="breadcrumbs" aria-label="Checkout progress">
+      <span>1 &middot; Parcel</span>
+      <span class="sep">&mdash;</span>
+      <span class="crumb-active">2 &middot; Delivery Address</span>
+      <span class="sep">&mdash;</span>
+      <span>3 &middot; Payment</span>
+      <span class="sep">&mdash;</span>
+      <span>4 &middot; Confirmation</span>
+    </nav>
+
+    <h2 class="page-title">Delivery Address</h2>
+
+    <div class="checkout-cols">
+      <!-- Address form -->
+      <div class="panel">
+        <h3>Where should we send it?</h3>
+
+        <div class="field">
+          <label for="f-name">Full name <span class="req">*</span></label>
+          <input type="text" id="f-name" autocomplete="name" placeholder="e.g. Kafil Ahmad">
+          <span class="err">Please enter your full name.</span>
+        </div>
+
+        <div class="field">
+          <label for="f-email">Email <span class="req">*</span></label>
+          <input type="email" id="f-email" autocomplete="email" placeholder="you@example.com">
+          <span class="err">Please enter a valid email address.</span>
+        </div>
+
+        <div class="field">
+          <label for="f-addr1">Address line 1 <span class="req">*</span></label>
+          <input type="text" id="f-addr1" autocomplete="address-line1" placeholder="Street address, house number">
+          <span class="err">Please enter your street address.</span>
+        </div>
+
+        <div class="field">
+          <label for="f-addr2">Address line 2 <span class="opt">(optional)</span></label>
+          <input type="text" id="f-addr2" autocomplete="address-line2" placeholder="Apartment, floor, building">
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="f-city">City <span class="req">*</span></label>
+            <input type="text" id="f-city" autocomplete="address-level2" placeholder="e.g. Amsterdam">
+            <span class="err">Please enter your city.</span>
+          </div>
+          <div class="field">
+            <label for="f-postcode">Postcode <span class="req">*</span></label>
+            <input type="text" id="f-postcode" autocomplete="postal-code" placeholder="e.g. 1012 AB">
+            <span class="err">Please enter your postcode.</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="f-country">Country <span class="req">*</span></label>
+          <select id="f-country" autocomplete="country-name">
+            <option value="">Select a country&hellip;</option>
+            <option>Ireland</option>
+            <option>Netherlands</option>
+            <option>United Kingdom</option>
+            <option>France</option>
+            <option>Germany</option>
+            <option>Spain</option>
+            <option>Portugal</option>
+            <option>Italy</option>
+            <option>United States</option>
+            <option>Japan</option>
+            <option>Other</option>
+          </select>
+          <span class="err">Please select your country.</span>
+        </div>
+
+        <div class="field">
+          <label for="f-phone">Phone <span class="opt">(optional, for the courier)</span></label>
+          <input type="tel" id="f-phone" autocomplete="tel" placeholder="+31 6 1234 5678">
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-secondary" id="backToShop">&larr; Back to shop</button>
+          <button class="btn-primary" id="toPayment">Continue to payment &rarr;</button>
+        </div>
+      </div>
+
+      <!-- Order summary -->
+      <div class="panel">
+        <h3>Order summary</h3>
+        <div id="summaryItems"></div>
+        <div class="totals">
+          <div class="trow"><span class="k">Subtotal</span><span class="v" id="sumSubtotal">&euro;0.00</span></div>
+          <div class="trow" id="shipRow"><span class="k">Shipping</span><span class="v" id="sumShipping">&euro;4.95</span></div>
+          <div class="grand"><span class="k">Total</span><span class="v" id="sumTotal">&euro;0.00</span></div>
+        </div>
+        <p class="ship-note">Free worldwide shipping over &euro;40</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= PAGE 3: PAYMENT ================= -->
+<div class="page" id="page-payment">
+  <div class="checkout-wrap">
+    <nav class="breadcrumbs" aria-label="Checkout progress">
+      <span>1 &middot; Parcel</span>
+      <span class="sep">&mdash;</span>
+      <span>2 &middot; Delivery Address</span>
+      <span class="sep">&mdash;</span>
+      <span class="crumb-active">3 &middot; Payment</span>
+      <span class="sep">&mdash;</span>
+      <span>4 &middot; Confirmation</span>
+    </nav>
+
+    <h2 class="page-title">Payment</h2>
+
+    <div class="checkout-cols">
+      <!-- Card form -->
+      <div class="panel">
+        <h3>Card details</h3>
+
+        <div class="field">
+          <label for="p-cardname">Name on card <span class="req">*</span></label>
+          <input type="text" id="p-cardname" autocomplete="cc-name" placeholder="As printed on the card">
+          <span class="err">Please enter the name on the card.</span>
+        </div>
+
+        <div class="field">
+          <label for="p-cardnum">Card number <span class="req">*</span></label>
+          <input type="text" id="p-cardnum" inputmode="numeric" autocomplete="cc-number"
+                 placeholder="1234 5678 9012 3456" maxlength="19">
+          <span class="err">Please enter a valid 16-digit card number.</span>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="p-expiry">Expiry <span class="req">*</span></label>
+            <input type="text" id="p-expiry" inputmode="numeric" autocomplete="cc-exp"
+                   placeholder="MM/YY" maxlength="5">
+            <span class="err">Enter expiry as MM/YY.</span>
+          </div>
+          <div class="field">
+            <label for="p-cvv">CVV <span class="req">*</span></label>
+            <input type="password" id="p-cvv" inputmode="numeric" autocomplete="cc-csc"
+                   placeholder="&bull;&bull;&bull;" maxlength="4">
+            <span class="err">Enter the 3&ndash;4 digit code.</span>
+          </div>
+        </div>
+
+        <p class="ship-note" style="text-align:left; margin-top:4px;">
+          Demo storefront &mdash; card details are not stored, sent, or charged.
+        </p>
+
+        <div class="btn-row">
+          <button class="btn-secondary" id="backToAddress">&larr; Back to address</button>
+          <button class="btn-primary" id="payNow">Pay now</button>
+        </div>
+      </div>
+
+      <!-- Payment summary -->
+      <div class="panel">
+        <h3>You're paying for</h3>
+        <div id="paySummaryItems"></div>
+        <div class="totals">
+          <div class="trow"><span class="k">Subtotal</span><span class="v" id="paySubtotal">&euro;0.00</span></div>
+          <div class="trow" id="payShipRow"><span class="k">Shipping</span><span class="v" id="payShipping">&euro;4.95</span></div>
+          <div class="grand"><span class="k">Total</span><span class="v" id="payTotal">&euro;0.00</span></div>
+        </div>
+        <div style="margin-top:16px; padding-top:12px; border-top:1px dashed var(--line);">
+          <h3 style="margin-bottom:8px; border:none; padding:0;">Delivering to</h3>
+          <div class="addr-lines" id="payAddr" style="font-size:0.86rem;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= PAGE 4: ORDER CONFIRMATION ================= -->
+<div class="page" id="page-confirm">
+  <div class="confirm-wrap">
+    <div class="confirm-stamp" aria-hidden="true">
+      <span class="tick">&#9993;&#65039;</span>
+      <span class="lbl">Posted &middot; First Class</span>
+    </div>
+
+    <h2>Your parcel is on its way</h2>
+    <p class="order-no" id="orderNo">ORDER NO. PA-000000</p>
+
+    <div class="confirm-panel">
+      <h3>Delivering to</h3>
+      <div class="addr-lines" id="confirmAddr"></div>
+    </div>
+
+    <div class="confirm-panel">
+      <h3>What's inside</h3>
+      <div id="confirmItems"></div>
+      <div class="totals">
+        <div class="trow"><span class="k">Subtotal</span><span class="v" id="cSubtotal">&euro;0.00</span></div>
+        <div class="trow"><span class="k">Shipping</span><span class="v" id="cShipping">&euro;0.00</span></div>
+        <div class="grand"><span class="k">Total paid</span><span class="v" id="cTotal">&euro;0.00</span></div>
+      </div>
+    </div>
+
+    <p class="confirm-note">A confirmation email is on its way to <strong id="confirmEmail"></strong>.<br>This is a demo storefront &mdash; no payment was taken and nothing will ship.</p>
+
+    <button class="btn-primary" id="shopAgain" style="flex:none; padding:13px 34px;">Continue shopping</button>
+  </div>
+</div>
+
+<!-- ================= PAGE 6: GALLERY ================= -->
+<div class="page" id="page-gallery">
+  <div class="checkout-wrap" style="max-width:1200px;">
+    <h2 class="page-title">Gallery</h2>
+    <p style="color:var(--muted); margin:-14px 0 20px; max-width:60ch;">
+      Every keepsake up close &mdash; filter by city, click an image for a closer look, and add to your parcel right from the picture.
+    </p>
+    <div class="filters" id="gFilters" role="group" aria-label="Filter by city" style="padding:0 0 16px;">
+      <span class="label">Filter:</span>
+    </div>
+    <div class="gallery-grid" id="galleryGrid"></div>
+  </div>
+</div>
+
+<!-- Gallery lightbox -->
+<div class="glightbox" id="glightbox">
+  <button class="gclose" id="gClose" aria-label="Close image">&times;</button>
+  <div class="gbig" id="gBig"></div>
+</div>
+
+<!-- ================= PAGE 5: CONTACT ================= -->
+<div class="page" id="page-contact">
+  <div class="checkout-wrap">
+    <h2 class="page-title">Contact Us</h2>
+
+    <div class="checkout-cols">
+      <!-- Contact form -->
+      <div class="panel">
+        <h3>Send us a message</h3>
+        <div id="contactFormBox">
+
+          <div class="field">
+            <label for="c-name">Your name <span class="req">*</span></label>
+            <input type="text" id="c-name" autocomplete="name" placeholder="e.g. Kafil Ahmad">
+            <span class="err">Please enter your name.</span>
+          </div>
+
+          <div class="field">
+            <label for="c-email">Email <span class="req">*</span></label>
+            <input type="email" id="c-email" autocomplete="email" placeholder="you@example.com">
+            <span class="err">Please enter a valid email address.</span>
+          </div>
+
+          <div class="field">
+            <label for="c-product">Which item is this about? <span class="req">*</span></label>
+            <select id="c-product">
+              <option value="">Select an item&hellip;</option>
+              <!-- all home-page products injected here by JS -->
+            </select>
+            <span class="err">Please choose an item (or "General enquiry").</span>
+          </div>
+
+          <div class="field">
+            <label for="c-message">Message <span class="req">*</span></label>
+            <textarea id="c-message" placeholder="Tell us what's on your mind &mdash; an order, a question, a special request&hellip;"></textarea>
+            <span class="err">Please write a short message.</span>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn-secondary" id="contactBack">&larr; Back to shop</button>
+            <button class="btn-primary" id="contactSend">Send message</button>
+          </div>
+        </div>
+
+        <!-- shown after a successful send -->
+        <div class="contact-sent" id="contactSent" style="display:none;">
+          <span class="big">&#128236;</span>
+          <h4>Message posted!</h4>
+          <p>Thanks for writing &mdash; we reply within one working day.<br>
+             (Demo storefront: no message was actually sent.)</p>
+          <div class="btn-row" style="justify-content:center;">
+            <button class="btn-primary" id="contactAgain" style="flex:none; padding:12px 28px;">Send another</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Direct contact details -->
+      <div class="panel">
+        <h3>Reach us directly</h3>
+        <div class="contact-rows">
+          <div class="contact-row">
+            <div class="ico" aria-hidden="true">&#128222;</div>
+            <div>
+              <div class="lbl">Phone</div>
+              <div class="val"><a href="tel:+31201234567">+31 20 123 4567</a></div>
+              <div class="sub">Mon&ndash;Fri, 9:00&ndash;17:30 CET</div>
+            </div>
+          </div>
+
+          <div class="contact-row">
+            <div class="ico" aria-hidden="true">&#128172;</div>
+            <div>
+              <div class="lbl">WhatsApp</div>
+              <div class="val"><a href="https://wa.me/31612345678" target="_blank" rel="noopener">+31 6 1234 5678</a></div>
+              <div class="sub">Quick questions &amp; order updates</div>
+            </div>
+          </div>
+
+          <div class="contact-row">
+            <div class="ico" aria-hidden="true">&#9993;&#65039;</div>
+            <div>
+              <div class="lbl">Email</div>
+              <div class="val"><a href="mailto:hello@paravion.shop">hello@paravion.shop</a></div>
+              <div class="sub">We reply within one working day</div>
+            </div>
+          </div>
+
+          <div class="contact-row">
+            <div class="ico" aria-hidden="true">&#128230;</div>
+            <div>
+              <div class="lbl">Returns &amp; parcels</div>
+              <div class="val">Par Avion Returns</div>
+              <div class="sub">Keizersgracht 100, 1015 CV Amsterdam, NL</div>
+            </div>
+          </div>
+        </div>
+        <p class="ship-note" style="text-align:left; margin-top:14px;">
+          Demo storefront &mdash; the details above are placeholders.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <span>Par Avion — Souvenir Marketplace</span>
+    <span>Demo storefront &middot; No real orders placed</span>
+  </div>
+</footer>
+
+<!-- Cart drawer -->
+<div class="overlay" id="overlay"></div>
+<aside class="drawer" id="drawer" aria-label="Shopping cart">
+  <div class="drawer-head">
+    <h2>Your Parcel</h2>
+    <button class="close-btn" id="closeCart" aria-label="Close cart">&times;</button>
+  </div>
+  <div class="drawer-items" id="drawerItems"></div>
+  <div class="drawer-foot">
+    <div class="subtotal-row">
+      <span class="lbl">Subtotal</span>
+      <span class="amt" id="subtotal">&euro;0.00</span>
+    </div>
+    <button class="checkout-btn" id="checkoutBtn" disabled>Proceed to checkout</button>
+    <p class="ship-note">Free worldwide shipping over &euro;40</p>
+  </div>
+</aside>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // =========================================================
+  // STEP 1: Product catalogue
+  // =========================================================
+  const PRODUCTS = [
+    { id: 1,  city: "Dublin",      name: "Ha'penny Bridge Enamel Pin",   desc: "Hand-finished pin of Dublin's most-crossed bridge.",            price: 9.50,  emoji: "\u{1F309}", bg: "linear-gradient(135deg,#DDEBDD,#B9D8C2)" },
+    { id: 2,  city: "Dublin",      name: "Claddagh Ring Keychain",        desc: "Hands, heart and crown — friendship you can clip on.",          price: 7.00,  emoji: "\u{1F49A}", bg: "linear-gradient(135deg,#E8F0E3,#CBE3C6)" },
+    { id: 3,  city: "Amsterdam",   name: "Delft Blue Canal House",        desc: "Miniature hand-painted ceramic house, no two alike.",           price: 14.00, emoji: "\u{1F3E0}", bg: "linear-gradient(135deg,#E3ECF7,#BFD4EE)" },
+    { id: 4,  city: "Amsterdam",   name: "Brass Bicycle Bell",            desc: "Ring like a local. Fits any handlebar, rings forever.",         price: 11.50, emoji: "\u{1F6B2}", bg: "linear-gradient(135deg,#F3EEE2,#E4D7B8)" },
+    { id: 5,  city: "Paris",       name: "Eiffel Tower Snow Globe",       desc: "Shake it and it snows in July. Classic dome, gold base.",       price: 12.00, emoji: "\u{1F5FC}", bg: "linear-gradient(135deg,#EFE6F2,#D8C6E4)" },
+    { id: 6,  city: "Paris",       name: "Caf\u00e9 de Flore Matchbook",  desc: "Vintage-style matchbook print, framed-ready postcard size.",    price: 5.50,  emoji: "\u2615",     bg: "linear-gradient(135deg,#F5EBE0,#E7D2BC)" },
+    { id: 7,  city: "Tokyo",       name: "Daruma Wishing Doll",           desc: "Paint one eye, make a wish, paint the other when it lands.",    price: 13.00, emoji: "\u{1F3EE}", bg: "linear-gradient(135deg,#F8E3DE,#F2C2B8)" },
+    { id: 8,  city: "Tokyo",       name: "Maneki-neko Lucky Cat",         desc: "Beckoning good fortune from your desk since forever.",          price: 16.00, emoji: "\u{1F408}", bg: "linear-gradient(135deg,#FBF0DC,#F3DCA8)" },
+    { id: 9,  city: "Lisbon",      name: "Azulejo Tile Coaster",          desc: "Cork-backed ceramic coaster in classic blue tilework.",         price: 8.50,  emoji: "\u{1F533}", bg: "linear-gradient(135deg,#E0EDF2,#B8D7E4)" },
+    { id: 10, city: "Istanbul",    name: "Evil Eye Wall Charm",           desc: "Hand-blown glass nazar to keep watch over your doorway.",       price: 10.00, emoji: "\u{1F9FF}", bg: "linear-gradient(135deg,#DFE9F5,#AECBEC)" },
+    { id: 11, city: "New York",    name: "Subway Token Magnet",           desc: "Replica brass token from the pre-MetroCard era.",               price: 6.50,  emoji: "\u{1F687}", bg: "linear-gradient(135deg,#EFEADF,#DCD2BB)" },
+    { id: 12, city: "Marrakech",   name: "Mini Tagine Spice Dish",        desc: "Palm-sized glazed tagine for salt, saffron or rings.",          price: 12.50, emoji: "\u{1F372}", bg: "linear-gradient(135deg,#F7E7D6,#EBC49E)" },
+    { id: 13, city: "Rome",        name: "Trevi Coin Postcard Set",       desc: "Six letterpress postcards. Coin toss not included.",            price: 9.00,  emoji: "\u{1F3DB}", bg: "linear-gradient(135deg,#F2EDE0,#E0D5B6)" },
+    { id: 14, city: "Mexico City", name: "Talavera Fridge Magnet",        desc: "Hand-painted ceramic in riotous traditional colour.",           price: 7.50,  emoji: "\u{1F335}", bg: "linear-gradient(135deg,#E8F2E3,#C4E3BE)" }
+  ];
+
+  // Shipping rules: flat rate below the free-shipping threshold
+  const SHIPPING_FLAT = 4.95;
+  const FREE_SHIP_OVER = 40;
+
+  // =========================================================
+  // STEP 2: State (in memory for the session)
+  // =========================================================
+  const cart = new Map();      // productId -> quantity
+  let activeCity = "All";
+
+  // =========================================================
+  // STEP 3: Element references + helpers
+  // =========================================================
+  const drawer      = document.getElementById("drawer");
+  const overlay     = document.getElementById("overlay");
+  const drawerItems = document.getElementById("drawerItems");
+  const subtotalEl  = document.getElementById("subtotal");
+  const cartCountEl = document.getElementById("cartCount");
+  const checkoutBtn = document.getElementById("checkoutBtn");
+  const toast       = document.getElementById("toast");
+
+  const fmt = n => "\u20AC" + n.toFixed(2);
+
+  const cartSubtotal = () =>
+    [...cart.entries()].reduce((sum, [id, qty]) => {
+      const p = PRODUCTS.find(x => x.id === id);
+      return sum + p.price * qty;
+    }, 0);
+
+  const shippingFor = subtotal =>
+    subtotal >= FREE_SHIP_OVER ? 0 : SHIPPING_FLAT;
+
+  // =========================================================
+  // STEP 4: Page navigation (shop / checkout / confirm)
+  // =========================================================
+  function showPage(pageId) {
+    document.querySelectorAll(".page").forEach(pg =>
+      pg.classList.toggle("active", pg.id === pageId));
+    window.scrollTo({ top: 0 });
+  }
+
+  document.getElementById("brandHome").addEventListener("click", () => showPage("page-shop"));
+  document.getElementById("backToShop").addEventListener("click", () => showPage("page-shop"));
+  document.getElementById("shopAgain").addEventListener("click", () => showPage("page-shop"));
+
+  // =========================================================
+  // STEP 5: City filter chips — live on the GALLERY page
+  // =========================================================
+  function renderFilters() {
+    const cities = ["All", ...new Set(PRODUCTS.map(p => p.city))];
+    const holder = document.getElementById("gFilters");
+    cities.forEach(city => {
+      const chip = document.createElement("button");
+      chip.className = "chip" + (city === activeCity ? " active" : "");
+      chip.textContent = city;
+      chip.addEventListener("click", () => setCityFilter(city));
+      holder.appendChild(chip);
+    });
+  }
+
+  // Central place to change the active city: updates chips + gallery
+  function setCityFilter(city) {
+    activeCity = city;
+    document.querySelectorAll("#gFilters .chip").forEach(c =>
+      c.classList.toggle("active", c.textContent === city));
+    renderGalleryProducts();
+  }
+
+  // =========================================================
+  // STEP 6: HOME — category cards (shop by city)
+  // Clicking a category opens the Gallery pre-filtered
+  // =========================================================
+  function renderCategories() {
+    const holder = document.getElementById("catGrid");
+    const cities = [...new Set(PRODUCTS.map(p => p.city))];
+
+    cities.forEach(city => {
+      const items = PRODUCTS.filter(p => p.city === city);
+      const card = document.createElement("button");
+      card.className = "cat-card";
+      card.innerHTML = `
+        <span class="cat-emoji" aria-hidden="true">${items[0].emoji}</span>
+        <span class="cat-name">${city}</span>
+        <span class="cat-count">${items.length} item${items.length > 1 ? "s" : ""}</span>`;
+      card.addEventListener("click", () => {
+        setCityFilter(city);          // pre-filter the gallery
+        showPage("page-gallery");
+      });
+      holder.appendChild(card);
+    });
+  }
+
+  // =========================================================
+  // STEP 7: Cart operations
+  // =========================================================
+  function addToCart(id, btn) {
+    cart.set(id, (cart.get(id) || 0) + 1);
+    updateCartUI();
+    showToast("Added to your parcel \u2709");
+
+    if (btn) {
+      btn.classList.add("added");
+      btn.textContent = "Added \u2713";
+      setTimeout(() => {
+        btn.classList.remove("added");
+        btn.textContent = "Add to cart";
+      }, 900);
+    }
+  }
+
+  function changeQty(id, delta) {
+    const next = (cart.get(id) || 0) + delta;
+    if (next <= 0) cart.delete(id);
+    else cart.set(id, next);
+    updateCartUI();
+  }
+
+  function removeItem(id) {
+    cart.delete(id);
+    updateCartUI();
+  }
+
+  // =========================================================
+  // STEP 8: Redraw drawer + badge + subtotal
+  // =========================================================
+  function updateCartUI() {
+    const totalItems = [...cart.values()].reduce((a, b) => a + b, 0);
+    cartCountEl.textContent = totalItems;
+
+    drawerItems.innerHTML = "";
+
+    if (cart.size === 0) {
+      drawerItems.innerHTML = `
+        <div class="cart-empty">
+          <span class="big">\u{1F4EA}</span>
+          Your parcel is empty.<br>Add a keepsake to get started.
+        </div>`;
+      subtotalEl.textContent = fmt(0);
+      checkoutBtn.disabled = true;
+      return;
+    }
+
+    cart.forEach((qty, id) => {
+      const p = PRODUCTS.find(x => x.id === id);
+      const row = document.createElement("div");
+      row.className = "cart-item";
+      row.innerHTML = `
+        <div class="thumb" style="background:${p.bg}">${p.emoji}</div>
+        <div class="info">
+          <h4>${p.name}</h4>
+          <span class="unit">${fmt(p.price)} each</span>
+          <div class="qty-row">
+            <button class="qty-btn" data-act="dec" aria-label="Decrease quantity">&minus;</button>
+            <span class="qty-num">${qty}</span>
+            <button class="qty-btn" data-act="inc" aria-label="Increase quantity">+</button>
+          </div>
+          <button class="remove-btn" data-act="rm">Remove</button>
+        </div>
+        <div class="line-total">${fmt(p.price * qty)}</div>`;
+
+      row.querySelector('[data-act="dec"]').addEventListener("click", () => changeQty(id, -1));
+      row.querySelector('[data-act="inc"]').addEventListener("click", () => changeQty(id, +1));
+      row.querySelector('[data-act="rm"]').addEventListener("click", () => removeItem(id));
+
+      drawerItems.appendChild(row);
+    });
+
+    subtotalEl.textContent = fmt(cartSubtotal());
+    checkoutBtn.disabled = false;
+  }
+
+  // =========================================================
+  // STEP 9: Drawer + toast
+  // =========================================================
+  function openCart()  { drawer.classList.add("open");  overlay.classList.add("open"); }
+  function closeCart() { drawer.classList.remove("open"); overlay.classList.remove("open"); }
+
+  document.getElementById("cartToggle").addEventListener("click", openCart);
+  document.getElementById("closeCart").addEventListener("click", closeCart);
+  overlay.addEventListener("click", closeCart);
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeCart(); });
+
+  let toastTimer;
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove("show"), 1600);
+  }
+
+  // =========================================================
+  // STEP 10: "Proceed to checkout" -> Delivery Address page
+  // Builds the order summary, then switches pages
+  // =========================================================
+  checkoutBtn.addEventListener("click", () => {
+    renderSummary();
+    closeCart();
+    showPage("page-checkout");
+  });
+
+  function renderSummary() {
+    const box = document.getElementById("summaryItems");
+    box.innerHTML = "";
+
+    cart.forEach((qty, id) => {
+      const p = PRODUCTS.find(x => x.id === id);
+      const row = document.createElement("div");
+      row.className = "sum-item";
+      row.innerHTML = `
+        <div class="thumb" style="background:${p.bg}">${p.emoji}</div>
+        <div>
+          <div class="nm">${p.name}</div>
+          <div class="q">Qty ${qty} &times; ${fmt(p.price)}</div>
+        </div>
+        <div class="amt">${fmt(p.price * qty)}</div>`;
+      box.appendChild(row);
+    });
+
+    const sub  = cartSubtotal();
+    const ship = shippingFor(sub);
+
+    document.getElementById("sumSubtotal").textContent = fmt(sub);
+    document.getElementById("sumShipping").textContent = ship === 0 ? "FREE" : fmt(ship);
+    document.getElementById("shipRow").classList.toggle("free", ship === 0);
+    document.getElementById("sumTotal").textContent = fmt(sub + ship);
+  }
+
+  // =========================================================
+  // STEP 11: Address form validation
+  // Required: name, email, address line 1, city, postcode, country
+  // =========================================================
+  const REQUIRED_FIELDS = ["f-name", "f-email", "f-addr1", "f-city", "f-postcode", "f-country"];
+
+  function validateForm() {
+    let ok = true;
+
+    REQUIRED_FIELDS.forEach(fid => {
+      const el = document.getElementById(fid);
+      let valid = el.value.trim() !== "";
+
+      // Extra check: email must look like an email
+      if (fid === "f-email" && valid) {
+        valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value.trim());
+      }
+
+      el.classList.toggle("invalid", !valid);
+      if (!valid) ok = false;
+    });
+
+    return ok;
+  }
+
+  // Clear the red border as soon as the user fixes a field
+  REQUIRED_FIELDS.forEach(fid => {
+    document.getElementById(fid).addEventListener("input", e =>
+      e.target.classList.remove("invalid"));
+  });
+
+  // =========================================================
+  // STEP 12: Delivery Address -> Payment page
+  // Validates the address, stores it, then shows Payment
+  // =========================================================
+  let pendingAddr = null;   // Address held between the two checkout steps
+
+  document.getElementById("toPayment").addEventListener("click", () => {
+    // Guard 1: cart must not be empty (e.g. user navigated back and emptied it)
+    if (cart.size === 0) {
+      showToast("Your parcel is empty \u2014 add something first");
+      showPage("page-shop");
+      return;
+    }
+
+    // Guard 2: all required address fields must be valid
+    if (!validateForm()) {
+      showToast("Please complete the highlighted fields");
+      return;
+    }
+
+    // Collect and store the address for the payment + confirmation steps
+    const get = fid => document.getElementById(fid).value.trim();
+    pendingAddr = {
+      name: get("f-name"), email: get("f-email"),
+      line1: get("f-addr1"), line2: get("f-addr2"),
+      city: get("f-city"), postcode: get("f-postcode"),
+      country: get("f-country"), phone: get("f-phone")
+    };
+
+    renderPaymentPage();
+    showPage("page-payment");
+  });
+
+  // "Back to address" keeps everything the user typed
+  document.getElementById("backToAddress").addEventListener("click", () =>
+    showPage("page-checkout"));
+
+  // =========================================================
+  // STEP 13: Build the Payment page (summary + delivery recap)
+  // =========================================================
+  function renderPaymentPage() {
+    // Item list
+    const box = document.getElementById("paySummaryItems");
+    box.innerHTML = "";
+    cart.forEach((qty, id) => {
+      const p = PRODUCTS.find(x => x.id === id);
+      const row = document.createElement("div");
+      row.className = "sum-item";
+      row.innerHTML = `
+        <div class="thumb" style="background:${p.bg}">${p.emoji}</div>
+        <div>
+          <div class="nm">${p.name}</div>
+          <div class="q">Qty ${qty} &times; ${fmt(p.price)}</div>
+        </div>
+        <div class="amt">${fmt(p.price * qty)}</div>`;
+      box.appendChild(row);
+    });
+
+    // Totals
+    const sub  = cartSubtotal();
+    const ship = shippingFor(sub);
+    document.getElementById("paySubtotal").textContent = fmt(sub);
+    document.getElementById("payShipping").textContent = ship === 0 ? "FREE" : fmt(ship);
+    document.getElementById("payShipRow").classList.toggle("free", ship === 0);
+    document.getElementById("payTotal").textContent = fmt(sub + ship);
+
+    // Delivery address recap
+    document.getElementById("payAddr").innerHTML =
+      [pendingAddr.name, pendingAddr.line1, pendingAddr.line2,
+       pendingAddr.city + " " + pendingAddr.postcode, pendingAddr.country]
+        .filter(Boolean)
+        .map(l => `<div>${l}</div>`)
+        .join("");
+  }
+
+  // =========================================================
+  // STEP 14: Card input formatting helpers
+  // =========================================================
+  // Card number: digits only, a space every 4 digits
+  document.getElementById("p-cardnum").addEventListener("input", e => {
+    const digits = e.target.value.replace(/\D/g, "").slice(0, 16);
+    e.target.value = digits.replace(/(.{4})/g, "$1 ").trim();
+    e.target.classList.remove("invalid");
+  });
+
+  // Expiry: digits only, auto-insert the slash after MM
+  document.getElementById("p-expiry").addEventListener("input", e => {
+    const digits = e.target.value.replace(/\D/g, "").slice(0, 4);
+    e.target.value = digits.length > 2 ? digits.slice(0, 2) + "/" + digits.slice(2) : digits;
+    e.target.classList.remove("invalid");
+  });
+
+  // CVV: digits only
+  document.getElementById("p-cvv").addEventListener("input", e => {
+    e.target.value = e.target.value.replace(/\D/g, "").slice(0, 4);
+    e.target.classList.remove("invalid");
+  });
+
+  document.getElementById("p-cardname").addEventListener("input", e =>
+    e.target.classList.remove("invalid"));
+
+  // =========================================================
+  // STEP 15: Validate card fields
+  // (demo-level checks: format only, no real card verification)
+  // =========================================================
+  function validateCard() {
+    let ok = true;
+
+    const name   = document.getElementById("p-cardname");
+    const num    = document.getElementById("p-cardnum");
+    const expiry = document.getElementById("p-expiry");
+    const cvv    = document.getElementById("p-cvv");
+
+    const nameOk   = name.value.trim() !== "";
+    const numOk    = num.value.replace(/\s/g, "").length === 16;
+    const expOk    = /^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry.value);
+    const cvvOk    = /^\d{3,4}$/.test(cvv.value);
+
+    name.classList.toggle("invalid", !nameOk);
+    num.classList.toggle("invalid", !numOk);
+    expiry.classList.toggle("invalid", !expOk);
+    cvv.classList.toggle("invalid", !cvvOk);
+
+    ok = nameOk && numOk && expOk && cvvOk;
+    return ok;
+  }
+
+  // =========================================================
+  // STEP 16: Pay now -> Confirmation page
+  // =========================================================
+  document.getElementById("payNow").addEventListener("click", () => {
+    // Guard: card fields must pass the format checks
+    if (!validateCard()) {
+      showToast("Please check the highlighted card fields");
+      return;
+    }
+
+    const addr = pendingAddr;
+
+    // Generate a demo order number, e.g. PA-483920
+    const orderNo = "PA-" + Math.floor(100000 + Math.random() * 900000);
+    document.getElementById("orderNo").textContent = "ORDER NO. " + orderNo;
+
+    // Fill the "Delivering to" panel
+    document.getElementById("confirmAddr").innerHTML =
+      [addr.name, addr.line1, addr.line2, addr.city + " " + addr.postcode, addr.country, addr.phone]
+        .filter(Boolean)
+        .map(l => `<div>${l}</div>`)
+        .join("");
+    document.getElementById("confirmEmail").textContent = addr.email;
+
+    // Fill the "What's inside" panel
+    const box = document.getElementById("confirmItems");
+    box.innerHTML = "";
+    cart.forEach((qty, id) => {
+      const p = PRODUCTS.find(x => x.id === id);
+      const row = document.createElement("div");
+      row.className = "sum-item";
+      row.innerHTML = `
+        <div class="thumb" style="background:${p.bg}">${p.emoji}</div>
+        <div>
+          <div class="nm">${p.name}</div>
+          <div class="q">Qty ${qty} &times; ${fmt(p.price)}</div>
+        </div>
+        <div class="amt">${fmt(p.price * qty)}</div>`;
+      box.appendChild(row);
+    });
+
+    const sub  = cartSubtotal();
+    const ship = shippingFor(sub);
+    document.getElementById("cSubtotal").textContent = fmt(sub);
+    document.getElementById("cShipping").textContent = ship === 0 ? "FREE" : fmt(ship);
+    document.getElementById("cTotal").textContent    = fmt(sub + ship);
+
+    // Order "placed": clear the cart and card fields, show confirmation
+    cart.clear();
+    updateCartUI();
+    ["p-cardname", "p-cardnum", "p-expiry", "p-cvv"].forEach(fid =>
+      document.getElementById(fid).value = "");
+    showPage("page-confirm");
+  });
+
+  // =========================================================
+  // STEP 17: Contact page
+  // =========================================================
+  // Navigation to/from the contact page (Home works from any page)
+  document.getElementById("navHome").addEventListener("click", () => showPage("page-shop"));
+  document.getElementById("navContact").addEventListener("click", () => showPage("page-contact"));
+  document.getElementById("contactBack").addEventListener("click", () => showPage("page-shop"));
+
+  // Populate the item dropdown with every product from the home page,
+  // grouped by city, plus a "General enquiry" option
+  function populateContactDropdown() {
+    const sel = document.getElementById("c-product");
+
+    // General option first
+    const gen = document.createElement("option");
+    gen.value = "general";
+    gen.textContent = "General enquiry (no specific item)";
+    sel.appendChild(gen);
+
+    // One <optgroup> per city, listing that city's products
+    const cities = [...new Set(PRODUCTS.map(p => p.city))];
+    cities.forEach(city => {
+      const grp = document.createElement("optgroup");
+      grp.label = city;
+      PRODUCTS.filter(p => p.city === city).forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p.id;
+        opt.textContent = `${p.name} \u2014 ${fmt(p.price)}`;
+        grp.appendChild(opt);
+      });
+      sel.appendChild(grp);
+    });
+  }
+
+  // Validate the contact form: name, valid email, item chosen, message
+  function validateContact() {
+    const name = document.getElementById("c-name");
+    const email = document.getElementById("c-email");
+    const product = document.getElementById("c-product");
+    const msg = document.getElementById("c-message");
+
+    const nameOk = name.value.trim() !== "";
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim());
+    const prodOk = product.value !== "";
+    const msgOk = msg.value.trim().length >= 5;
+
+    name.classList.toggle("invalid", !nameOk);
+    email.classList.toggle("invalid", !emailOk);
+    product.classList.toggle("invalid", !prodOk);
+    msg.classList.toggle("invalid", !msgOk);
+
+    return nameOk && emailOk && prodOk && msgOk;
+  }
+
+  // Clear red borders while the user types
+  ["c-name", "c-email", "c-product", "c-message"].forEach(fid => {
+    document.getElementById(fid).addEventListener("input", e =>
+      e.target.classList.remove("invalid"));
+  });
+
+  // "Send message": validate, then show the success state (demo only)
+  document.getElementById("contactSend").addEventListener("click", () => {
+    if (!validateContact()) {
+      showToast("Please complete the highlighted fields");
+      return;
+    }
+    document.getElementById("contactFormBox").style.display = "none";
+    document.getElementById("contactSent").style.display = "block";
+    showToast("Message posted \u2709");
+  });
+
+  // "Send another": reset the form and show it again
+  document.getElementById("contactAgain").addEventListener("click", () => {
+    ["c-name", "c-email", "c-message"].forEach(fid =>
+      document.getElementById(fid).value = "");
+    document.getElementById("c-product").value = "";
+    document.getElementById("contactSent").style.display = "none";
+    document.getElementById("contactFormBox").style.display = "block";
+  });
+
+  // =========================================================
+  // STEP 18: GALLERY — the shop floor
+  // Product images with price + Add-to-cart ON the image,
+  // filtered by the city chips above the grid
+  // =========================================================
+  document.getElementById("navGallery").addEventListener("click", () => showPage("page-gallery"));
+
+  function renderGalleryProducts() {
+    const g = document.getElementById("galleryGrid");
+    g.innerHTML = "";
+
+    const visible = PRODUCTS.filter(p => activeCity === "All" || p.city === activeCity);
+
+    visible.forEach(p => {
+      const card = document.createElement("div");
+      card.className = "gcard";
+      card.innerHTML = `
+        <div class="scene" style="background:${p.bg}" tabindex="0" role="button"
+             aria-label="View ${p.name} larger">
+          <span class="sky-label">${p.city}</span>
+          <span aria-hidden="true" style="font-size:4rem;">${p.emoji}</span>
+          <div class="gbar">
+            <span class="gprice">${fmt(p.price)}</span>
+            <button class="add-btn" data-id="${p.id}">Add to cart</button>
+          </div>
+        </div>
+        <div class="meta">
+          <span class="gcity">${p.city}</span>
+          <span class="gcap">${p.name}</span>
+        </div>`;
+
+      // Add-to-cart on the image (stop the click from opening the lightbox)
+      const btn = card.querySelector(".add-btn");
+      btn.addEventListener("click", e => {
+        e.stopPropagation();
+        addToCart(p.id, btn);
+      });
+
+      // Clicking the image itself opens the enlarged view
+      const scene = card.querySelector(".scene");
+      scene.addEventListener("click", () => openProductLightbox(p.id));
+      scene.addEventListener("keydown", e => { if (e.key === "Enter") openProductLightbox(p.id); });
+
+      g.appendChild(card);
+    });
+  }
+
+  // Lightbox: enlarged product image, with price + Add to cart there too
+  function openProductLightbox(id) {
+    const p = PRODUCTS.find(x => x.id === id);
+    const big = document.getElementById("gBig");
+    big.innerHTML = `
+      <div class="scene" style="background:${p.bg}">
+        <span aria-hidden="true">${p.emoji}</span>
+      </div>
+      <div class="meta">
+        <div>
+          <div class="gcity">${p.name}</div>
+          <div class="gcap" style="text-align:left;">${p.city} \u2014 ${p.desc}</div>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
+          <span class="gprice" style="font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:1.1rem;">${fmt(p.price)}</span>
+          <button class="add-btn" id="lbAdd">Add to cart</button>
+        </div>
+      </div>`;
+    document.getElementById("lbAdd").addEventListener("click", () =>
+      addToCart(p.id, document.getElementById("lbAdd")));
+    document.getElementById("glightbox").classList.add("open");
+  }
+
+  function closeLightbox() {
+    document.getElementById("glightbox").classList.remove("open");
+  }
+
+  document.getElementById("gClose").addEventListener("click", closeLightbox);
+  document.getElementById("glightbox").addEventListener("click", e => {
+    if (e.target.id === "glightbox") closeLightbox();   // click outside the card
+  });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeLightbox(); });
+
+  // =========================================================
+  // STEP 19: Initial render
+  // =========================================================
+  renderFilters();          // gallery filter chips
+  renderCategories();       // home: shop-by-city cards
+  renderGalleryProducts();  // gallery: shoppable image grid
+  updateCartUI();
+  populateContactDropdown();
+</script>
+
+</body>
+</html>

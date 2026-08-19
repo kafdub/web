@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XYZ — Engineer & Builder</title>
+<meta name="description" content="Personal website of XYZ — software engineer, data visualization specialist, and occasional writer.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Source+Serif+4:ital,opsz,wght@0,8..60,300..600;1,8..60,300..600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ============ TOKENS ============ */
+  :root{
+    --paper:      #EDF0F3;   /* cool grey-blue paper */
+    --ink:        #10182B;   /* near-black navy ink   */
+    --ink-soft:   #4A5468;   /* secondary text        */
+    --cobalt:     #2742D6;   /* single strong accent  */
+    --amber:      #E8A13C;   /* rare warm highlight   */
+    --line:       #C6CDD8;   /* hairlines             */
+    --card:       #F7F9FB;
+
+    --display: "Archivo", sans-serif;
+    --body:    "Source Serif 4", Georgia, serif;
+    --mono:    "IBM Plex Mono", monospace;
+
+    --max: 1080px;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; }
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    *, *::before, *::after{ animation:none !important; transition:none !important; }
+  }
+
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--body);
+    font-size:1.06rem;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  a{ color:var(--cobalt); text-decoration:none; }
+  a:hover{ text-decoration:underline; text-underline-offset:3px; }
+  a:focus-visible, button:focus-visible{
+    outline:2px solid var(--cobalt); outline-offset:3px; border-radius:2px;
+  }
+
+  ::selection{ background:var(--cobalt); color:#fff; }
+
+  /* ============ LAYOUT SHELL ============ */
+  .shell{
+    max-width:var(--max);
+    margin:0 auto;
+    padding:0 24px;
+  }
+
+  /* ============ TOP BAR ============ */
+  header.top{
+    position:sticky; top:0; z-index:20;
+    background:color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .top-inner{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 24px; max-width:var(--max); margin:0 auto;
+  }
+  .wordmark{
+    font-family:var(--display);
+    font-weight:800; font-stretch:120%;
+    letter-spacing:.02em; font-size:1.05rem;
+    color:#006A4E;                          /* green "kafil"  */
+    transition:color .2s ease;
+  }
+  .wordmark span{ color:#F42A41; transition:color .2s ease; }   /* red ".bd" */
+  .wordmark:hover{ color:#F42A41; text-decoration:none; }       /* swap on hover */
+  .wordmark:hover span{ color:#006A4E; }
+  nav.primary{ display:flex; gap:26px; }
+  nav.primary a{
+    font-family:var(--mono); font-size:.78rem; letter-spacing:.06em;
+    color:var(--ink-soft); text-transform:uppercase;
+  }
+  nav.primary a:hover{ color:var(--cobalt); text-decoration:none; }
+  nav.primary a.active{ color:var(--cobalt); }
+
+  /* ============ HERO ============ */
+  .hero{ padding:96px 0 72px; border-bottom:1px solid var(--line); }
+  .kicker{
+    font-family:var(--mono); font-size:.8rem; letter-spacing:.1em;
+    text-transform:uppercase; color:var(--cobalt); margin-bottom:20px;
+  }
+  h1.name{
+    font-family:var(--display);
+    font-weight:900; font-stretch:115%;
+    font-size:clamp(3rem, 9vw, 6.4rem);
+    line-height:.95; letter-spacing:-.01em;
+    text-transform:uppercase;
+  }
+  h1.name .accent{ color:var(--cobalt); }
+  .role-line{
+    margin-top:28px; font-size:1.25rem; color:var(--ink-soft);
+    text-align:justify;
+  }
+  .role-line strong{ color:var(--ink); font-weight:600; }
+  #rotating-role{
+    color:var(--cobalt); font-style:italic; border-bottom:2px solid var(--amber);
+  }
+  .hero-cta{ margin-top:40px; display:flex; gap:16px; flex-wrap:wrap; }
+  .btn{
+    display:inline-block; font-family:var(--mono); font-size:.82rem;
+    letter-spacing:.05em; text-transform:uppercase;
+    padding:12px 22px; border:1.5px solid var(--ink); color:var(--ink);
+    transition:background .15s ease, color .15s ease;
+  }
+  .btn:hover{ background:var(--ink); color:var(--paper); text-decoration:none; }
+  .btn.primary{ background:var(--cobalt); border-color:var(--cobalt); color:#fff; }
+  .btn.primary:hover{ background:var(--ink); border-color:var(--ink); }
+
+  /* ============ SECTION SCAFFOLD ============ */
+  section.block{ padding:72px 0; border-bottom:1px solid var(--line); }
+  .block-head{
+    display:flex; align-items:baseline; gap:18px; margin-bottom:40px;
+  }
+  .block-head h2{
+    font-family:var(--display); font-weight:800; font-stretch:118%;
+    font-size:1.7rem; text-transform:uppercase; letter-spacing:.01em;
+    color:var(--cobalt);
+  }
+  .block-head .rule{ flex:1; height:1px; background:var(--line); }
+  .block-head .tag{
+    font-family:var(--mono); font-size:.72rem; color:var(--ink-soft);
+    letter-spacing:.08em;
+  }
+
+  /* ============ ABOUT ============ */
+  .about-grid{ display:grid; grid-template-columns:1.4fr 1fr; gap:56px; }
+  .about-grid p{ text-align:justify; }
+  .about-grid p + p{ margin-top:1em; }
+  .facts{ border-left:2px solid var(--cobalt); padding-left:24px; align-self:start; }
+  .facts dt{
+    font-family:var(--mono); font-size:.72rem; letter-spacing:.08em;
+    text-transform:uppercase; color:var(--ink-soft); margin-top:18px;
+  }
+  .facts dt:first-child{ margin-top:0; }
+  .facts dd{ font-size:1rem; margin-top:4px; }
+  .cv-link{ display:inline-flex; align-items:center; gap:8px; }
+  .cv-link svg{ flex:none; }
+
+  /* ============ WORK ============ */
+  .work-list{
+    display:grid; grid-template-columns:1fr; gap:12px;
+  }
+  .work-item{
+    display:flex; flex-direction:column; gap:4px;
+    background:var(--card); border:1px solid var(--line);
+    padding:14px 20px; transition:border-color .15s ease;
+  }
+  .work-item:hover{ border-color:var(--cobalt); }
+  .work-year{ font-family:var(--mono); font-size:.75rem; color:var(--ink-soft); }
+  .work-item h3{
+    font-family:var(--display); font-weight:700; font-stretch:112%;
+    font-size:1.1rem;
+  }
+  .work-item p{ color:var(--ink-soft); font-size:.94rem; flex:1; }
+  .work-link{ font-family:var(--mono); font-size:.78rem; white-space:nowrap; margin-top:auto; }
+
+  /* ============ WRITING ============ */
+  .writing-list{ list-style:none; counter-reset:pub; }
+  .writing-list li{
+    display:grid; grid-template-columns:28px 2.2fr 1fr auto;
+    gap:20px; align-items:baseline;
+    padding:8px 4px; border-bottom:1px dashed var(--line);
+  }
+  .writing-list li::before{
+    counter-increment:pub; content:counter(pub);
+    font-family:var(--mono); font-size:.76rem; color:var(--ink-soft);
+  }
+  .writing-list li:first-child{ border-top:1px dashed var(--line); }
+  .writing-list .w-title{ font-size:1.05rem; }
+  .writing-list .w-pub{
+    font-family:var(--mono); font-size:.76rem; color:var(--ink-soft); white-space:nowrap;
+  }
+  .writing-list .w-date{
+    font-family:var(--mono); font-size:.76rem; color:var(--ink-soft); white-space:nowrap;
+    text-align:right;
+  }
+  @media (max-width:760px){
+    .writing-list li{ grid-template-columns:28px 1fr; gap:4px 12px; }
+    .writing-list .w-pub, .writing-list .w-date{ grid-column:2; }
+    .writing-list .w-date{ text-align:left; }
+  }
+
+  /* ============ CONTACT ============ */
+  .contact-inner p{ font-size:1.15rem; text-align:justify; }
+  .contact-links{ margin-top:32px; display:flex; gap:14px; flex-wrap:wrap; }
+
+  /* ============ FOOTER ============ */
+  footer.site{
+    padding:36px 0 48px;
+    display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap;
+    font-family:var(--mono); font-size:.74rem; color:var(--ink-soft);
+    letter-spacing:.05em;
+  }
+
+  /* ============ REVEAL ON SCROLL ============ */
+  .reveal{ opacity:0; transform:translateY(14px); transition:opacity .5s ease, transform .5s ease; }
+  .reveal.in{ opacity:1; transform:none; }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width:760px){
+    nav.primary{ display:none; }
+    .about-grid{ grid-template-columns:1fr; gap:36px; }
+    .work-list{ grid-template-columns:1fr; }
+    .hero{ padding:64px 0 52px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ======= TOP BAR ======= -->
+<header class="top">
+  <div class="top-inner">
+    <a href="#" class="wordmark" aria-label="XYZ home">xyz<span>.bd</span></a>
+    <nav class="primary" aria-label="Primary">
+      <a href="#about">About</a>
+      <a href="#work">Work</a>
+      <a href="#writing">Writing</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main class="shell">
+
+  <!-- ======= HERO ======= -->
+  <section class="hero">
+    <p class="kicker">Personal site · Dublin, IE</p>
+    <h1 class="name">Hello</h1>
+    <h1 class="name">I'm  <span class="accent"> XYZ</span></h1>
+    <p class="role-line">
+      I'm a <strong id="rotating-role">software engineer</strong> who enjoys turning
+      messy problems into simple, reliable tools — and writing about what I learn along the way.
+    </p>
+    <div class="hero-cta">
+      <a class="btn" href="#work">See my work</a>
+      <a class="btn" href="#contact">Get in touch</a>
+      <a class="btn primary" href="www.xyz.com">Download CV</a>
+    </div>
+  </section>
+
+  <!-- ======= ABOUT ======= -->
+  <section class="block reveal" id="about">
+    <div class="block-head">
+      <h2>About</h2>
+      <div class="rule"></div>
+      <span class="tag">01</span>
+    </div>
+    <div class="about-grid">
+      <div>
+        <p>
+          I spend most of my time building software: backend services, data pipelines,
+          and the occasional front-end when a chart deserves better than a spreadsheet.
+          I care about tools that stay understandable six months after they ship.
+        </p>
+        <p>
+          Before engineering, I studied mathematics, which is probably why I still reach
+          for a whiteboard before an IDE. Outside of work you'll find me running along
+          the coast, reading history, or losing gracefully at chess.
+        </p>
+        <p>
+          This site is a small home for the things I make and write. Everything here is
+          my own opinion — usually held loosely.
+        </p>
+      </div>
+      <dl class="facts">
+        <dt>Currently</dt>
+        <dd>Senior Engineer, somewhere interesting</dd>
+        <dt>Focus</dt>
+        <dd>Data platforms · Visualization · Python & TypeScript</dd>
+        <dt>Based in</dt>
+        <dd>Dublin, Ireland</dd>
+        <dt>Elsewhere</dt>
+        <dd><a href="#">GitHub</a> · <a href="#">LinkedIn</a> · <a href="#">RSS</a></dd>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ======= WORK ======= -->
+  <section class="block reveal" id="work">
+    <div class="block-head">
+      <h2>Selected Work</h2>
+      <div class="rule"></div>
+      <span class="tag">02</span>
+    </div>
+    <div class="work-list">
+      <article class="work-item">
+        <span class="work-year">2026</span>
+        <div>
+          <h3>Ledgerline</h3>
+          <p>An open-source library for rendering large time-series datasets in the browser without melting the main thread.</p>
+        </div>
+        <a class="work-link" href="#">View →</a>
+      </article>
+      <article class="work-item">
+        <span class="work-year">2025</span>
+        <div>
+          <h3>Quietboard</h3>
+          <p>A minimal, keyboard-first dashboard builder for internal metrics. Built with a small team; used daily by a not-so-small one.</p>
+        </div>
+        <a class="work-link" href="#">View →</a>
+      </article>
+      <article class="work-item">
+        <span class="work-year">2024</span>
+        <div>
+          <h3>Pipeline field guide</h3>
+          <p>A practical handbook on designing data pipelines that fail loudly and recover quietly. Free to read online.</p>
+        </div>
+        <a class="work-link" href="#">Read →</a>
+      </article>
+    </div>
+  </section>
+
+  <!-- ======= WRITING ======= -->
+  <section class="block reveal" id="writing">
+    <div class="block-head">
+      <h2>Writing</h2>
+      <div class="rule"></div>
+      <span class="tag">03</span>
+    </div>
+    <ul class="writing-list">
+      <li>
+        <a class="w-title" href="#">Boring technology is a feature, not a compromise</a>
+        <span class="w-pub">Personal blog</span>
+        <span class="w-date">Jun 2026</span>
+      </li>
+      <li>
+        <a class="w-title" href="#">What I learned rewriting the same chart four times</a>
+        <span class="w-pub">Nightingale</span>
+        <span class="w-date">Mar 2026</span>
+      </li>
+      <li>
+        <a class="w-title" href="#">Notes on naming things (still hard)</a>
+        <span class="w-pub">Personal blog</span>
+        <span class="w-date">Nov 2025</span>
+      </li>
+      <li>
+        <a class="w-title" href="#">A gentle introduction to backpressure</a>
+        <span class="w-pub">InfoQ</span>
+        <span class="w-date">Aug 2025</span>
+      </li>
+      <li>
+        <a class="w-title" href="#">Test</a>
+        <span class="w-pub">Test</span>
+        <span class="w-date">Aug 2025</span>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ======= CONTACT ======= -->
+  <section class="block reveal" id="contact" style="border-bottom:none;">
+    <div class="block-head">
+      <h2>Contact</h2>
+      <div class="rule"></div>
+      <span class="tag">04</span>
+    </div>
+    <div class="contact-inner">
+      <p>
+        The best way to reach me is email. I read everything, reply to most of it,
+        and am always happy to talk about interesting problems, good books,
+        or why your favourite database is wrong.
+      </p>
+      <div class="contact-links">
+        <a class="btn primary" href="mailto:hello@xyz.example">hello@xyz.example</a>
+        <a class="btn" href="#">GitHub</a>
+        <a class="btn" href="#">LinkedIn</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site shell">
+  <span>© 2026 XYZ — Built by hand, no framework harmed.</span>
+  <span>Last updated · <span id="last-updated"></span></span>
+</footer>
+
+<script>
+  // ---- Rotating role word in the hero ----
+  // Step 1: define the roles to cycle through
+  const roles = ["software engineer", "data tinkerer", "occasional writer", "chart enthusiast"];
+  let roleIndex = 0;
+  const roleEl = document.getElementById("rotating-role");
+
+  // Step 2: respect users who prefer reduced motion — skip the rotation entirely
+  const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (!prefersReduced) {
+    // Step 3: swap the word every 2.6 seconds with a small fade
+    setInterval(() => {
+      roleIndex = (roleIndex + 1) % roles.length;
+      roleEl.style.opacity = 0;
+      setTimeout(() => {
+        roleEl.textContent = roles[roleIndex];
+        roleEl.style.transition = "opacity .3s ease";
+        roleEl.style.opacity = 1;
+      }, 300);
+    }, 2600);
+  }
+
+  // ---- Reveal sections on scroll ----
+  // Step 1: observe every .reveal section
+  const observer = new IntersectionObserver((entries) => {
+    // Step 2: when a section enters the viewport, add the .in class once
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("in");
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+
+  // ---- Highlight the active nav link while scrolling ----
+  // Step 1: map each section id to its nav link
+  const navLinks = document.querySelectorAll("nav.primary a");
+  const sections = [...navLinks].map((a) => document.querySelector(a.getAttribute("href")));
+
+  // Step 2: on scroll, find the section nearest the top and mark its link active
+  const navObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        navLinks.forEach((a) => a.classList.toggle(
+          "active", a.getAttribute("href") === "#" + entry.target.id
+        ));
+      }
+    });
+  }, { rootMargin: "-40% 0px -55% 0px" });
+
+  sections.forEach((s) => s && navObserver.observe(s));
+
+  // ---- Dynamic "Last updated" date in the footer ----
+  // Step 1: take the file's own last-modified timestamp from the browser
+  const lastModified = new Date(document.lastModified);
+  // Step 2: format it as "23 Jul 2026" and drop it into the footer
+  document.getElementById("last-updated").textContent =
+    lastModified.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+</script>
+
+</body>
+</html>
